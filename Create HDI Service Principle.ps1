@@ -22,11 +22,14 @@ $app = New-AzureRmADApplication -DisplayName $azureApplicationName -HomePage $ur
 New-AzureRmADServicePrincipal -ApplicationId $app.ApplicationId
 
 # Export the certificate to the desktop
+# You now have the PFX file that is pasword protected (keep safe and/or upload to Azure Key Vault)
 $mypwd = ConvertTo-SecureString -String $certificatePassword -Force –AsPlainText
 $desktopPath = [Environment]::GetFolderPath("Desktop") + "\" + $azureApplicationName + ".pfx"
 Export-PfxCertificate -Cert $cert -FilePath $desktopPath -Password $mypwd
 
-# When the developers select the certificate in the Portal (HDInsights w/data lake) 
+# This is the JSON needed for a HDInsight ARM template
+# You can create a HDI cluster in the Azure Portal, then at the end of the processs, before creating the cluster, click Export
+# This section can replace what you have exported.
 $json = '"clusterIdentity": {
                "clusterIdentity.applicationId": "' + $app.ApplicationId + '",
                "clusterIdentity.certificate": "' + $keyValue + '",
