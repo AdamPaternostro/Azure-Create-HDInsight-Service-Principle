@@ -1,4 +1,4 @@
-﻿# Creates a new certificate and creates a service principle for HDI
+# Creates a new certificate and creates a service principle for HDI
 # https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-authenticate-service-principal
 # https://technet.microsoft.com/en-us/library/hh848633.aspx
 # https://technet.microsoft.com/en-us/library/hh848635.aspx
@@ -14,7 +14,6 @@ $Sub = Select-AzureRmSubscription -SubscriptionId $subscriptionId
 # Create the certificate
 $subject="CN=" + $azureApplicationName
 $cert = New-SelfSignedCertificate -CertStoreLocation "cert:\CurrentUser\My" -Subject $subject -KeySpec KeyExchange
-$keyValue = [System.Convert]::ToBase64String($cert.GetRawCertData())
 
 # Create the Azure application
 $uri="https://" + $azureApplicationName + ".com"
@@ -26,6 +25,8 @@ New-AzureRmADServicePrincipal -ApplicationId $app.ApplicationId
 $mypwd = ConvertTo-SecureString -String $certificatePassword -Force –AsPlainText
 $desktopPath = [Environment]::GetFolderPath("Desktop") + "\" + $azureApplicationName + ".pfx"
 Export-PfxCertificate -Cert $cert -FilePath $desktopPath -Password $mypwd
+
+$keyValue = [System.Convert]::ToBase64String((Get-Content $desktopPath -Encoding Byte))
 
 # This is the JSON needed for a HDInsight ARM template
 # You can create a HDI cluster in the Azure Portal, then at the end of the processs, before creating the cluster, click Export
