@@ -14,6 +14,7 @@ $Sub = Select-AzureRmSubscription -SubscriptionId $subscriptionId
 # Create the certificate
 $subject="CN=" + $azureApplicationName
 $cert = New-SelfSignedCertificate -CertStoreLocation "cert:\CurrentUser\My" -Subject $subject -KeySpec KeyExchange
+$keyValue = [System.Convert]::ToBase64String($cert.GetRawCertData())
 
 # Create the Azure application
 $uri="https://" + $azureApplicationName + ".com"
